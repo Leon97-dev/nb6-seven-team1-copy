@@ -1,6 +1,10 @@
 // src/controllers/image-controller.js
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { PrismaClient } from '@prisma/client';
+import { error } from 'console';
+
+const prisma = new PrismaClient();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,7 +21,7 @@ function toPublicUrl(req, absolutePath) {
 }
 
 // 단일 이미지 검증/응답
-export const handleSingleUpload = (req, res, next) => {
+export const handleSingleUpload = async (req, res, next) => {
   try {
     if (!req.file) {
       return res.status(400).json({
@@ -26,9 +30,24 @@ export const handleSingleUpload = (req, res, next) => {
       });
     }
 
+    const groupId = Number(req.body?.groupId);
+    if (!groupId) {
+      return res.status(400).json({
+        ok: false,
+        error: { code: 'NO_GROUP_ID', message: 'groupId가 필요합니다.' },
+      });
+    }
+
+    const imageUrl = toPublicUrl(req, req.file.path);
+
+    await prisma.group.update({
+      where: { id: groupId },
+      data: { photoUrl: imageUrl },
+    });
+
     return res.status(201).json({
       ok: true,
-      data: { file: req.file },
+      data: { imageUrl },
     });
   } catch (e) {
     return next(e);
@@ -36,7 +55,7 @@ export const handleSingleUpload = (req, res, next) => {
 };
 
 // 다중 이미지 검증/응답
-export const handleMultiUpload = (req, res, next) => {
+export const handleMultiUpload = async (req, res, next) => {
   try {
     const files = Array.isArray(req.files) ? req.files : [];
 
@@ -47,9 +66,24 @@ export const handleMultiUpload = (req, res, next) => {
       });
     }
 
+    const recordId = Number(req.body?.recordId);
+    if (!recordId) {
+      return res.status(400).json({
+        ok: false,
+        error: { code: 'NO_RECORD_ID', message: 'recordId가 필요합니다.' },
+      });
+    }
+
+    const imageUrls = files.map((f) => toPublicUrl(req, f.path));
+
+    await prisma.record.update({
+      where: { id: recordId },
+      data: { photos: { push: imageUrls } },
+    });
+
     return res.status(201).json({
       ok: true,
-      data: { file: req.file },
+      data: { imageUrls },
     });
   } catch (e) {
     return next(e);
