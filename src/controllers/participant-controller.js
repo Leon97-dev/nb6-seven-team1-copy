@@ -26,7 +26,7 @@ class ParticipantController {
         include: { owner: true },
       });
       if (!group) {
-        throw new NotFoundError('group', '그룹을 찾을 수 없습니다.');
+        throw new NotFoundError('그룹을 찾을 수 없습니다.');
       }
 
       //닉네임 검사
@@ -34,20 +34,33 @@ class ParticipantController {
         where: { nickname, groupId: Number(groupId) },
       });
       if (check) {
-        throw new ConflictError('nickname', '이미 존재하는 닉네임입니다.');
+        throw new ConflictError('이미 존재하는 닉네임입니다.');
       }
 
+      //참여자 생성
       const participants = await prisma.participant.create({
         data: { nickname, password, groupId: Number(groupId) },
-        include: {
-          group: {
-            include: {
-              owner: true,
-            },
-          },
-        },
       });
-      res.send(participants);
+      //응답 구조 생성
+      const responseData = {
+        ...group,
+        owner: {
+          id: group.owner.id,
+          nickname: group.owner.nickname,
+          createdAt: group.owner.createdAt,
+          updatedAt: group.owner.updatedAt,
+        },
+        participants: [
+          {
+            id: participants.id,
+            nickname: participants.nickname,
+            createdAt: participants.createdAt,
+            updatedAt: participants.updatedAt,
+          },
+        ],
+      };
+
+      res.status(200).send(responseData);
     } catch (e) {
       res.status(e.statusCode).send({
         path: e.path,
@@ -75,7 +88,7 @@ class ParticipantController {
         where: { id: Number(groupId) },
       });
       if (!group) {
-        throw new NotFoundError('group', '그룹을 찾을 수 없습니다.');
+        throw new NotFoundError('그룹을 찾을 수 없습니다.');
       }
 
       const participant = await prisma.participant.findFirst({
@@ -85,7 +98,7 @@ class ParticipantController {
         },
       });
       if (!participant) {
-        throw new NotFoundError('nickname', '해당 닉네임의 참여자를 찾을 수 없습니다.');
+        throw new NotFoundError('해당 닉네임의 참여자를 찾을 수 없습니다.');
       }
       if (participant.password !== password) {
         throw new UnauthorizedError('password', '비밀번호가 일치하지 않습니다.');
