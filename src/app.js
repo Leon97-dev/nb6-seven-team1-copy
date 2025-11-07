@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 import { errorHandler, notFoundHandler } from "./middlewares/error-handler.js";
+import imageRoutes from './routes/image-routes.js';
 import healthRoutes from "./routes/health-routes.js";
 import participantRoutes from './routes/participant-routes.js';
 import groupLikeCount from "./routes/group-like-count-routes.js";
@@ -35,9 +36,13 @@ app.use('/health', healthRoutes);
 // ============================================
 // TODO: 개발하신 라우터들을 이곳에서 구현 및 적용하시면 됩니다.
 // ============================================
-app.use("/groups", groupLikeCount);
 
-app.use('/groups', participantRoutes);
+// 1. 이미지 업로드
+app.use('/images', imageRoutes);
+
+// 3. 그룹 관련 라우터들 
+app.use('/groups', participantRoutes);    // /groups/:groupId/participants
+app.use("/groups", groupLikeCount);       // /groups/:groupId/like
 
 // 404 핸들러
 app.use(notFoundHandler);
