@@ -1,12 +1,13 @@
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { errorHandler, notFoundHandler } from './middlewares/error-handler.js';
-import healthRoutes from './routes/health-routes.js';
-import { debugLog } from './utils/debug.js';
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
+import { errorHandler, notFoundHandler } from "./middlewares/error-handler.js";
+import healthRoutes from "./routes/health-routes.js";
 import participantRoutes from './routes/participant-routes.js';
+import groupLikeCount from "./routes/group-like-count-routes.js";
+import { debugLog } from "./utils/debug.js";
 
 // ES 모듈에서 __dirname 사용하기
 const __filename = fileURLToPath(import.meta.url);
@@ -34,7 +35,7 @@ app.use('/health', healthRoutes);
 // ============================================
 // TODO: 개발하신 라우터들을 이곳에서 구현 및 적용하시면 됩니다.
 // ============================================
-// app.use('/groups', groupRoutes); //예시임
+app.use("/groups", groupLikeCount);
 
 app.use('/groups', participantRoutes);
 
