@@ -1,40 +1,64 @@
 import { PrismaClient } from "@prisma/client";
+import { NotFoundError } from "../middlewares/error-handler.js";
 
 const prisma = new PrismaClient();
 
-export async function groupLikeCountUp(req, res) {
-  const id = Number(req.params.id);
-  const findGroup = await prisma.group.findUnique({
-    where: { id },
-  });
+class GroupLikeCount{
+  async groupLikeCountUp(req, res) {
 
-  if (!findGroup) return res.status(404).send({ message: "Group not found" });
+    const ID = Number(req.params.id);
 
-  const likeCountUp = await prisma.group.update({
-    where: { id },
-    data: {
-      likeCount: { increment: 1 },
-    },
-  });
+    const findGroup = await prisma.group.findUnique({
+      where: { id: ID },
+    });
 
-  res.status(201).send(likeCountUp);
+    if (!findGroup) {
+      throw new NotFoundError("그룹을 찾을 수 없습니다");
+    }
+
+    const likeCountUp = await prisma.group.update({
+      where: { id: ID },
+      data: {
+        likeCount: { increment: 1 },
+      },
+    });
+
+    res.status(200).json({
+      message: "그룹 추천 성공",
+      data: {
+        id: likeCountUp.id,
+        likeCount: likeCountUp.likeCount,
+      },
+    });
+  }
+
+  async groupLikeCountDown(req, res) {
+
+    const id = Number(req.params.id);
+
+    const findGroup = await prisma.group.findUnique({
+      where: { id },
+    });
+
+    if (!findGroup) {
+      throw new NotFoundError("그룹을 찾을 수 없습니다");
+    }
+
+    const likeCountDown = await prisma.group.update({
+      where: { id },
+      data: {
+        likeCount: { decrement: 1 },
+      },
+    });
+
+    res.status(200).json({
+      message: "그룹 추천 취소 성공",
+      data: {
+        id: likeCountDown.id,
+        likeCount: likeCountDown.likeCount,
+      },
+    });
+  }
 }
 
-export async function groupLikeCountDown(req, res) {
-  const id = Number(req.params.id);
-  const findGroup = await prisma.group.findUnique({
-    where: { id },
-  });
-
-  if (!findGroup) return res.status(404).send({ message: "Group not found" });
-
-  const likeCountDown = await prisma.group.update({
-    where: { id },
-    data: {
-      likeCount: { decrement: 1 },
-    },
-  });
-
-  // 감소 요청 성공 코드에 뭘 써야할 지 몰라서 일단 200 작성
-  res.status(200).send(likeCountDown);
-}
+export default new GroupLikeCount();

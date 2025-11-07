@@ -5,7 +5,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { errorHandler, notFoundHandler } from "./middlewares/error-handler.js";
 import healthRoutes from "./routes/health-routes.js";
-import { groupLikeCount } from "./routes/group-like-count-routes.js";
+import groupLikeCount from "./routes/group-like-count-routes.js";
 import { debugLog } from "./utils/debug.js";
 
 // ES 모듈에서 __dirname 사용하기

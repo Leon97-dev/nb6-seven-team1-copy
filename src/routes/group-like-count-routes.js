@@ -1,15 +1,9 @@
 import express from "express";
-import { PrismaClient } from "@prisma/client";
-import {
-  groupLikeCountUp,
-  groupLikeCountDown,
-} from "../controllers/group-like-count-controller.js";
+import groupLikeCountController from "../controllers/group-like-count-controller.js";
 
-const groupLikeCount = express.Router();
-const groupLikeCountRoute = groupLikeCount.route("/:id/likes");
+const router = express.Router();
 
-groupLikeCountRoute.post(groupLikeCountUp);
+router.post("/:id/likes", groupLikeCountController.groupLikeCountUp);
+router.delete("/:id/likes", groupLikeCountController.groupLikeCountDown);
 
-groupLikeCountRoute.delete(groupLikeCountDown);
-
-export { groupLikeCount };
+export default router;
