@@ -2,18 +2,21 @@ import express from 'express';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { errorHandler, notFoundHandler } from './middlewares/error-handler.js';
-import imageRoutes from './routes/image-routes.js';
-import healthRoutes from './routes/health-routes.js';
-import participantRoutes from './routes/participant-routes.js';
-import groupLikeCount from './routes/group-like-count-routes.js';
 import { debugLog } from './utils/debug.js';
+
+// ============================================
+// 미들웨어 import
+// ============================================
 import { errorHandler, notFoundHandler } from './middlewares/error-handler.js';
 
+// ============================================
 // 라우터 import
+// ============================================
 import healthRoutes from './routes/health-routes.js';
-import recordRoutes from './routes/record-routes.js';
 import imageRoutes from './routes/image-routes.js';
+import participantRoutes from './routes/participant-routes.js';
+import groupLikeCount from './routes/group-like-count-routes.js';
+import recordRoutes from './routes/record-routes.js';
 
 // ============================================
 // 환경 변수 설정
@@ -48,21 +51,22 @@ app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 
 // ============================================
 // 라우터 등록
+// ============================================
+
+// 헬스 체크
 app.use('/health', healthRoutes);
 
 // ============================================
 // TODO: 개발하신 라우터들을 이곳에서 구현 및 적용하시면 됩니다.
 // ============================================
 
-// 1. 이미지 업로드
+// 1. 이미지 업로드 API
 app.use('/images', imageRoutes);
 
-// 3. 그룹 관련 라우터들
+// 2. 그룹 관련 라우터들
 app.use('/groups', participantRoutes); // /groups/:groupId/participants
 app.use('/groups', groupLikeCount); // /groups/:groupId/like
-
-// 이미지 업로드 API
-app.use('/images', imageRoutes);
+app.use('/groups/:groupId/records', recordRoutes); // /groups/:groupId/records
 
 // ============================================
 // 404 핸들러
