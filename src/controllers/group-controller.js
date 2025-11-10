@@ -145,6 +145,10 @@ class GroupController {
         throw new NotFoundError("group ID가 존재하지 않습니다.");
       }
 
+      if (!group.owner) {
+        throw new UnauthorizedError("Group owner의 정보를 찾을 수 없습니다.");
+      }
+
       const ownerPassword = group.owner.password;
       debugLog(ownerPassword);
 
@@ -182,6 +186,10 @@ class GroupController {
         throw new NotFoundError("group ID가 존재하지 않습니다.");
       }
 
+      if (!findGroup.owner) {
+        throw new UnauthorizedError("Group owner의 정보를 찾을 수 없습니다.");
+      }
+
       const ownerPassword = findGroup.owner.password;
       debugLog(ownerPassword);
 
@@ -202,7 +210,7 @@ class GroupController {
         data: req.body,
       });
 
-      res.status(201).json({ message: "group 수정 완료", data: group });
+      res.status(200).json({ message: "group 수정 완료", data: group });
     } catch (err) {
       next(err);
     }
