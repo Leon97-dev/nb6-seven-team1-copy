@@ -77,7 +77,8 @@ class GroupController {
         throw new ValidationError("그룹명은 필수입니다");
       }
 
-      if (!Number.isInteger(req.body.goalRep) || req.body.goalRep <= 0) {
+      const goalRep = parseInt(req.body.goalRep);
+      if (!Number.isInteger(req.body.goalRep) || goalRep <= 0) {
         throw new ValidationError("목표 횟수는 0 이상의 수여야 합니다.");
       }
 
@@ -146,7 +147,7 @@ class GroupController {
       }
 
       if (!group.owner) {
-        throw new UnauthorizedError("Group owner의 정보를 찾을 수 없습니다.");
+        throw new UnauthorizedError("group owner의 정보를 찾을 수 없습니다.");
       }
 
       const ownerPassword = group.owner.password;
@@ -187,7 +188,7 @@ class GroupController {
       }
 
       if (!findGroup.owner) {
-        throw new UnauthorizedError("Group owner의 정보를 찾을 수 없습니다.");
+        throw new UnauthorizedError("group owner의 정보를 찾을 수 없습니다.");
       }
 
       const ownerPassword = findGroup.owner.password;
@@ -201,13 +202,16 @@ class GroupController {
         throw new ValidationError("그룹명은 필수입니다");
       }
 
-      if (!Number.isInteger(req.body.goalRep) || Number(req.body.goalRep) < 0) {
+      const goalRep = parseInt(req.body.goalRep);
+      if (!Number.isInteger(req.body.goalRep) || goalRep < 0) {
         throw new ValidationError("목표 횟수는 0 이상의 수여야 합니다.");
       }
 
+      const { password, ...updateData } = req.body;
+
       const group = await prisma.group.update({
         where: { id: Number(id) },
-        data: req.body,
+        data: updateData,
       });
 
       res.status(200).json({ message: "group 수정 완료", data: group });
