@@ -171,7 +171,7 @@ class GroupController {
   async patchGroup(req, res, next) {
     try {
       const { id } = req.params;
-      const { pw } = req.body;
+      const { pw, ...updateData } = req.body;
       const findGroup = await prisma.group.findUnique({
         where: { id: Number(id) },
         select: {
@@ -187,16 +187,16 @@ class GroupController {
         throw new NotFoundError("group ID가 존재하지 않습니다.");
       }
 
-      if (!findGroup.owner) {
-        throw new UnauthorizedError("group owner의 정보를 찾을 수 없습니다.");
-      }
+      // if (!findGroup.owner) {
+      //   throw new UnauthorizedError("group owner의 정보를 찾을 수 없습니다.");
+      // }
 
-      const ownerPassword = findGroup.owner.password;
-      debugLog(ownerPassword);
+      // const ownerPassword = findGroup.owner.password;
+      // debugLog(ownerPassword);
 
-      if (pw !== ownerPassword) {
-        throw new UnauthorizedError("group owner의 비밀번호가 틀렸습니다.");
-      }
+      // if (pw !== ownerPassword) {
+      //   throw new UnauthorizedError("group owner의 비밀번호가 틀렸습니다.");
+      // }
 
       if (!req.body.name) {
         throw new ValidationError("그룹명은 필수입니다");
@@ -206,8 +206,6 @@ class GroupController {
       if (!Number.isInteger(req.body.goalRep) || goalRep < 0) {
         throw new ValidationError("목표 횟수는 0 이상의 수여야 합니다.");
       }
-
-      const { password, ...updateData } = req.body;
 
       const group = await prisma.group.update({
         where: { id: Number(id) },
