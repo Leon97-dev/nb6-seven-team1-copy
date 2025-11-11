@@ -16,6 +16,7 @@ import healthRoutes from './routes/health-routes.js';
 import imageRoutes from './routes/image-routes.js';
 import participantRoutes from './routes/participant-routes.js';
 import groupLikeCount from './routes/group-like-count-routes.js';
+import rankingRoutes from './routes/ranking-routes.js';
 import recordRoutes from './routes/record-routes.js';
 
 // ============================================
@@ -64,8 +65,10 @@ app.use('/health', healthRoutes);
 app.use('/images', imageRoutes);
 
 // 2. 그룹 관련 라우터들
+app.use("/groups", groupRouter);
 app.use('/groups', participantRoutes); // /groups/:groupId/participants
 app.use('/groups', groupLikeCount); // /groups/:groupId/like
+app.use('/groups', rankingRoutes); // /groups/:groupId/rank
 app.use('/groups/:groupId/records', recordRoutes); // /groups/:groupId/records
 
 // ============================================
