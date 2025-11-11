@@ -64,6 +64,7 @@ app.use('/health', healthRoutes);
 app.use('/images', imageRoutes);
 
 // 2. 그룹 관련 라우터들
+app.use("/groups", groupRouter);
 app.use('/groups', participantRoutes); // /groups/:groupId/participants
 app.use('/groups', groupLikeCount); // /groups/:groupId/like
 app.use('/groups/:groupId/records', recordRoutes); // /groups/:groupId/records
