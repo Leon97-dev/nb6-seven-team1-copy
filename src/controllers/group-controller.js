@@ -74,6 +74,10 @@ class GroupController {
         throw new ValidationError('소유자의 id가 없거나 인식되지 않았습니다.');
       }
 
+      const [photoUrl] = req.body.photoUrl;
+
+      console.log([photoUrl]);
+
       const group = await prisma.group.create({
         data: req.body,
       });
