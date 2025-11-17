@@ -1,5 +1,5 @@
 import prisma from '../utils/prisma.js';
-import { NotFoundError } from '../middlewares/error-handler.js';
+import { NotFoundError, ValidationError } from '../middlewares/error-handler.js';
 import { updateGroupBadges } from './badge-controller.js';
 
 class GroupLikeCount {
@@ -15,7 +15,7 @@ class GroupLikeCount {
         throw new NotFoundError('그룹을 찾을 수 없습니다');
       }
 
-      const likeCountUp = await prisma.group.update({
+      await prisma.group.update({
         where: { id: groupId },
         data: {
           likeCount: { increment: 1 },
@@ -25,13 +25,8 @@ class GroupLikeCount {
       //좋아요 뱃지 가능 여부 확인
       await updateGroupBadges(groupId);
 
-      res.status(200).json({
-        message: '그룹 추천 성공',
-        data: {
-          id: likeCountUp.id,
-          likeCount: likeCountUp.likeCount,
-        },
-      });
+      // API 명세서에 따라 빈 응답
+      res.sendStatus(200);
     } catch (error) {
       next(error);
     }
@@ -50,25 +45,21 @@ class GroupLikeCount {
       }
 
       if (findGroup.likeCount < 1) {
-        throw new NotFoundError('더 이상 감소할 수 없습니다');
+        throw new ValidationError('likeCount', '더 이상 감소할 수 없습니다');
       }
 
-      const likeCountDown = await prisma.group.update({
+      await prisma.group.update({
         where: { id: groupId },
         data: {
           likeCount: { decrement: 1 },
         },
       });
+
       //좋아요 뱃지 가능 여부 확인
       await updateGroupBadges(groupId);
 
-      res.status(200).json({
-        message: '그룹 추천 취소 성공',
-        data: {
-          id: likeCountDown.id,
-          likeCount: likeCountDown.likeCount,
-        },
-      });
+      // API 명세서에 따라 빈 응답
+      res.sendStatus(200);
     } catch (error) {
       next(error);
     }
