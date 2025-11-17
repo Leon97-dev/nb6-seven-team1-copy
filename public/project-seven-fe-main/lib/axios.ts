@@ -3,7 +3,7 @@ import Axios from 'axios';
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export const axios = Axios.create({
-  baseURL: BASE_URL,
+  baseURL: 'https://seven-api-f5mj.onrender.com',
 });
 
 axios.interceptors.request.use((config) => {
