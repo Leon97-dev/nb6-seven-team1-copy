@@ -43,6 +43,6 @@ export async function updateGroupBadges(groupId) {
     //return 추가
     return { updated: true, badges: updated.badges };
   } catch (err) {
-    console.log(err);
+    debugError('배지 업데이트 실패:', err);
   }
 }

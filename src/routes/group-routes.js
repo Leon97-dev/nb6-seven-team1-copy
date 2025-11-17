@@ -12,5 +12,7 @@ groupRouter
   .post('/', uploadMulti, groupController.createGroup) //img 업로드 미들웨어 추가
   .delete('/:id', groupController.deleteGroup)
   .patch('/:id', uploadMulti, groupController.patchGroup); //img 업로드 미들웨어 추가
+  .post('/:id/likes', groupLikeCount.groupLikeCountUp);
+  .delete('/:id/likes', groupLikeCount.groupLikeCountDown);
 
 export default groupRouter;

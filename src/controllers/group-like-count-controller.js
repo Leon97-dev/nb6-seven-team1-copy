@@ -1,5 +1,5 @@
 import prisma from '../utils/prisma.js';
-import { NotFoundError } from '../middlewares/error-handler.js';
+import { NotFoundError, ValidationError } from '../middlewares/error-handler.js';
 import { updateGroupBadges } from './badge-controller.js';
 
 class GroupLikeCount {
