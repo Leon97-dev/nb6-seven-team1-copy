@@ -11,6 +11,10 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'seven-api-f5mj.onrender.com',
+      },
+      {
+        protocol: 'https',
         hostname: 'sprint-be-project.s3.ap-northeast-2.amazonaws.com',
       },
     ],
