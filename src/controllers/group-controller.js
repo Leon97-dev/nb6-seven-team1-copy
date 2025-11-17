@@ -198,6 +198,7 @@ class GroupController {
     try {
       const { id } = req.params;
       const { pw, ...updateData } = req.body;
+      let dataToUpdate = { ...updateData };
 
       const findGroup = await prisma.group.findUnique({
         where: { id: Number(id) },
@@ -225,21 +226,37 @@ class GroupController {
         throw new UnauthorizedError('group owner의 비밀번호가 틀렸습니다.');
       }
 
-      if (!req.body.name) {
+      if (!updateData.name) {
         throw new ValidationError('그룹명은 필수입니다');
       }
 
-      const goalRep = parseInt(req.body.goalRep);
-      if (!Number.isInteger(req.body.goalRep) || goalRep < 0) {
+      console.log(updateData.goalRep);
+
+      dataToUpdate.goalRep = parseInt(updateData.goalRep);
+      if (!Number.isInteger(dataToUpdate.goalRep) || dataToUpdate.goalRep < 0) {
         throw new ValidationError('목표 횟수는 0 이상의 수여야 합니다.');
+      }
+
+      // 미들웨어를 사용하여 이미지 파일 받아오기
+      const mainImgs = req.files;
+
+      if (mainImgs && mainImgs.length > 0) {
+        dataToUpdate.photoUrl = `uploads/${mainImgs[0].filename}`;
       }
 
       const group = await prisma.group.update({
         where: { id: Number(id) },
-        data: updateData,
+        data: dataToUpdate,
       });
 
-      res.status(200).json({ message: 'group 수정 완료', data: group });
+      // Group Img 경로 제공을 위해 response 값 변환
+      const baseUrl = process.env.BASE_URL || '';
+      const groupResponse = {
+        ...group,
+        photoUrl: group.photoUrl ? `${baseUrl}/${group.photoUrl}` : null,
+      };
+
+      res.status(200).json({ message: 'group 수정 완료', data: groupResponse });
     } catch (err) {
       next(err);
     }
