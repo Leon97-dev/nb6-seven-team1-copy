@@ -67,61 +67,90 @@ class GroupController {
   //group 데이터 추가
   async createGroup(req, res, next) {
     try {
-      // ==== 이미지 관련 추가 작업 start / 김지선 ====
-      // 1. 이미지 URL 덮어쓰기 방지 및 validation 진행 한 값 분리
-      const { name, goalRep, ownerId, photoUrl, ...body } = req.body;
+      const { name, goalRep, photoUrl, ownerNickname, ownerPassword, ...body } = req.body;
 
-      // 2. 검증 작업 단순화
+      // 1. 필수 필드 검증
       if (!name) {
-        throw new ValidationError('그룹명은 필수입니다');
+        throw new ValidationError('name', '그룹명은 필수입니다');
+      }
+
+      if (!ownerNickname) {
+        throw new ValidationError('ownerNickname', '소유자 닉네임은 필수입니다');
+      }
+
+      if (!ownerPassword) {
+        throw new ValidationError('ownerPassword', '소유자 비밀번호는 필수입니다');
       }
 
       const finalGoalRep = parseInt(goalRep);
       if (!Number.isInteger(finalGoalRep) || finalGoalRep < 0) {
-        throw new ValidationError('목표 횟수는 0 이상의 수여야 합니다.');
+        throw new ValidationError('goalRep', '목표 횟수는 0 이상의 정수여야 합니다');
       }
 
-      const finalOwnerId = parseInt(ownerId);
-      if (!finalOwnerId) {
-        console.log(finalOwnerId);
-        throw new ValidationError('소유자의 id가 없거나 인식되지 않았습니다.');
-      }
-
-      // 3. multer 파일 받아오기
+      // 2. multer 파일 받아오기
       const mainImgs = req.files;
       const finalPhotoUrl =
         mainImgs && mainImgs.length > 0 ? `uploads/${mainImgs[0].filename}` : null;
 
+      // 3. Owner(Participant) 생성 후 Group 생성
       const group = await prisma.group.create({
         data: {
           ...body,
           name,
           goalRep: finalGoalRep,
-          ownerId: finalOwnerId,
           photoUrl: finalPhotoUrl,
+          owner: {
+            create: {
+              nickname: ownerNickname,
+              password: ownerPassword,
+            },
+          },
+        },
+        include: {
+          owner: {
+            select: {
+              id: true,
+              nickname: true,
+              createdAt: true,
+              updatedAt: true,
+            },
+          },
+          participants: {
+            select: {
+              id: true,
+              nickname: true,
+              createdAt: true,
+              updatedAt: true,
+            },
+          },
         },
       });
-      // ==== 이미지 관련 추가 작업 End ====
 
       debugLog('group 생성 완료', group);
 
+      // 4. 응답 데이터 생성
       const baseUrl = process.env.BASE_URL || '';
       const groupResponse = {
-        ...group,
+        id: group.id,
+        name: group.name,
+        description: group.description,
         photoUrl: group.photoUrl ? `${baseUrl}/${group.photoUrl}` : null,
+        goalRep: group.goalRep,
+        discordWebhookUrl: group.discordWebhookUrl,
+        discordInviteUrl: group.discordInviteUrl,
+        likeCount: group.likeCount,
+        tags: group.tags,
+        owner: group.owner,
+        participants: group.participants,
+        createdAt: group.createdAt,
+        updatedAt: group.updatedAt,
+        badges: group.badges,
       };
 
-      res.status(201).json({ message: 'group 생성 완료', data: groupResponse });
+      res.status(201).json(groupResponse);
     } catch (err) {
       debugError('group 생성 실패', err);
-
       next(err);
-      /*
-      res.status(err.statusCode).json({
-      message: err.message,
-      error: "SERVER_ERROR",
-    });
-      */
     }
   }
 

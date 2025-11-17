@@ -7,6 +7,7 @@ import {
   convertArrayImageFieldsToUrls,
 } from '../utils/image-utils.js';
 import { sendChangeRecordMsg } from '../utils/discord-msg-utils.js';
+import { updateGroupBadges } from './badge-controller.js'; // 추가
 
 /**
  * 운동 기록 컨트롤러

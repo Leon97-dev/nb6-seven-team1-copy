@@ -25,7 +25,6 @@ class ParticipantController {
       //그룹 확인
       const group = await prisma.group.findUnique({
         where: { id: Number(groupId) },
-        include: { owner: true },
       });
       if (!group) {
         throw new NotFoundError('그룹을 찾을 수 없습니다.');
@@ -40,33 +39,56 @@ class ParticipantController {
       }
 
       //참여자 생성
-      const participants = await prisma.participant.create({
+      await prisma.participant.create({
         data: { nickname, password, groupId: Number(groupId) },
       });
 
       //참여자 뱃지 가능 여부 확인
       await updateGroupBadges(groupId);
 
-      //응답 구조 생성
-      const responseData = {
-        ...group,
-        owner: {
-          id: group.owner.id,
-          nickname: group.owner.nickname,
-          createdAt: group.owner.createdAt,
-          updatedAt: group.owner.updatedAt,
-        },
-        participants: [
-          {
-            id: participants.id,
-            nickname: participants.nickname,
-            createdAt: participants.createdAt,
-            updatedAt: participants.updatedAt,
+      // 그룹의 모든 정보를 다시 조회 (owner, 모든 participants 포함)
+      const updatedGroup = await prisma.group.findUnique({
+        where: { id: Number(groupId) },
+        include: {
+          owner: {
+            select: {
+              id: true,
+              nickname: true,
+              createdAt: true,
+              updatedAt: true,
+            },
           },
-        ],
+          participants: {
+            select: {
+              id: true,
+              nickname: true,
+              createdAt: true,
+              updatedAt: true,
+            },
+          },
+        },
+      });
+
+      // 이미지 URL 처리
+      const baseUrl = process.env.BASE_URL || '';
+      const responseData = {
+        id: updatedGroup.id,
+        name: updatedGroup.name,
+        description: updatedGroup.description,
+        photoUrl: updatedGroup.photoUrl ? `${baseUrl}/${updatedGroup.photoUrl}` : null,
+        goalRep: updatedGroup.goalRep,
+        discordWebhookUrl: updatedGroup.discordWebhookUrl,
+        discordInviteUrl: updatedGroup.discordInviteUrl,
+        likeCount: updatedGroup.likeCount,
+        tags: updatedGroup.tags,
+        owner: updatedGroup.owner,
+        participants: updatedGroup.participants, // 모든 참여자
+        createdAt: updatedGroup.createdAt,
+        updatedAt: updatedGroup.updatedAt,
+        badges: updatedGroup.badges,
       };
 
-      res.status(200).send(responseData);
+      res.status(201).send(responseData); // 201로 변경
     } catch (error) {
       debugError('참여자 생성 실패:', error);
       next(error);
