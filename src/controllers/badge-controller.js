@@ -21,7 +21,7 @@ export async function updateGroupBadges(groupId) {
     //뱃지 조건 확인 - 추가, 제거
     participantCount >= 10 ? badgesSet.add('PARTICIPANT_10') : badgesSet.delete('PARTICIPANT_10');
     recordCount >= 100 ? badgesSet.add('RECORD_100') : badgesSet.delete('RECORD_100');
-    group.likeCount >= 100 ? badgesSet.add('LIKE_100') : badgesSet.delete('LIKECOUNT_100');
+    group.likeCount >= 100 ? badgesSet.add('LIKE_100') : badgesSet.delete('LIKE_100');
 
     //조건에 따라서 만든 뱃지, Set를 스프래드연산자로 배열 전환
     const newBadges = [...badgesSet];
@@ -30,7 +30,7 @@ export async function updateGroupBadges(groupId) {
 
     //정렬 후 둘을 비교해서 같다면 업데이트를 하지 않고 기존 뱃지 배열을 가지고감
     //길이가 같고, 새로운 뱃지와 기존 뱃지의 내용이 같은지 비교
-    if (newBadges.length === oldBadges.length && newBadges.every((b) => oldBadges.includes[b])) {
+    if (newBadges.length === oldBadges.length && newBadges.every((b) => oldBadges.includes(b))) {
       return { updated: false, badges: oldBadges };
     }
 
