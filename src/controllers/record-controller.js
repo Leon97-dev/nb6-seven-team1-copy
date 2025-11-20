@@ -13,6 +13,8 @@ import { updateGroupBadges } from './badge-controller.js'; // 추가
  * 운동 기록 컨트롤러
  * 그룹의 운동 기록 생성, 조회, 목록 조회 기능 제공
  */
+const DEFAULT_AUTHOR = { id: null, nickname: '탈퇴한 참여자' };
+
 class RecordController {
   // ============================================
   // POST /groups/:groupId/records - 운동 기록 생성
@@ -193,7 +195,7 @@ class RecordController {
         time: record.time,
         distance: record.distance,
         photos: record.photos,
-        author: record.author,
+        author: record.author ?? DEFAULT_AUTHOR,
         createdAt: record.createdAt,
         updatedAt: record.updatedAt,
       }));
@@ -266,7 +268,7 @@ class RecordController {
         time: recordWithUrls.time,
         distance: recordWithUrls.distance,
         photos: recordWithUrls.photos,
-        author: recordWithUrls.author,
+        author: recordWithUrls.author ?? DEFAULT_AUTHOR,
         createdAt: recordWithUrls.createdAt,
         updatedAt: recordWithUrls.updatedAt,
       };
