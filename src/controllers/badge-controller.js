@@ -1,4 +1,11 @@
 import prisma from '../utils/prisma.js';
+import { debugError } from '../utils/debug.js';
+
+const BADGE_TYPES = {
+  PARTICIPATION_10: 'PARTICIPATION_10',
+  RECORD_100: 'RECORD_100',
+  LIKE_100: 'LIKE_100',
+};
 
 export async function updateGroupBadges(groupId) {
   try {
@@ -19,9 +26,14 @@ export async function updateGroupBadges(groupId) {
     const badgesSet = new Set(group.badges || []);
 
     //뱃지 조건 확인 - 추가, 제거
-    participantCount >= 10 ? badgesSet.add('PARTICIPANT_10') : badgesSet.delete('PARTICIPANT_10');
-    recordCount >= 100 ? badgesSet.add('RECORD_100') : badgesSet.delete('RECORD_100');
-    group.likeCount >= 100 ? badgesSet.add('LIKE_100') : badgesSet.delete('LIKE_100');
+    if (participantCount >= 10) badgesSet.add(BADGE_TYPES.PARTICIPATION_10);
+    else badgesSet.delete(BADGE_TYPES.PARTICIPATION_10);
+
+    if (recordCount >= 100) badgesSet.add(BADGE_TYPES.RECORD_100);
+    else badgesSet.delete(BADGE_TYPES.RECORD_100);
+
+    if (group.likeCount >= 100) badgesSet.add(BADGE_TYPES.LIKE_100);
+    else badgesSet.delete(BADGE_TYPES.LIKE_100);
 
     //조건에 따라서 만든 뱃지, Set를 스프래드연산자로 배열 전환
     const newBadges = [...badgesSet];

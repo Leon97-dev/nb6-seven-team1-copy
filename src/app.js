@@ -62,10 +62,6 @@ app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 // 헬스 체크
 app.use('/health', healthRoutes);
 
-// ============================================
-// TODO: 개발하신 라우터들을 이곳에서 구현 및 적용하시면 됩니다.
-// ============================================
-
 // 1. 이미지 업로드 API
 app.use('/images', imageRoutes);
 
