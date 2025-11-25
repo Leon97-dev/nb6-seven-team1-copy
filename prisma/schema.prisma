@@ -14,26 +14,26 @@ datasource db {
 // Group (그룹)
 // ============================================
 model Group {
-  id                 Int           @id @default(autoincrement())
-  name               String
-  description        String?
-  photoUrl           String?       @map("photo_url")
-  goalRep            Int           @default(100) @map("goal_rep") // 기본값 설정
-  tags               String[]      @default([]) // 기본값 설정
-  discordWebhookUrl  String?       @map("discord_webhook_url")
-  discordInviteUrl   String?       @map("discord_invite_url")
-  likeCount          Int           @default(0) @map("like_count")
-  badges             String[]      @default([]) 
-  
+  id                Int      @id @default(autoincrement())
+  name              String
+  description       String?
+  photoUrl          String?  @map("photo_url")
+  goalRep           Int      @default(100) @map("goal_rep") // 기본값 설정
+  tags              String[] @default([]) // 기본값 설정
+  discordWebhookUrl String?  @map("discord_webhook_url")
+  discordInviteUrl  String?  @map("discord_invite_url")
+  likeCount         Int      @default(0) @map("like_count")
+  badges            String[] @default([])
+
   // 관계
-  ownerId            Int?          @map("owner_id")  // nullable로 변경
-  owner              Participant?  @relation("GroupOwner", fields: [ownerId], references: [id], onDelete: SetNull)
-  participants       Participant[] @relation("GroupParticipants")
-  records            Record[]
+  ownerId      Int?          @map("owner_id") // nullable로 변경
+  owner        Participant?  @relation("GroupOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  participants Participant[] @relation("GroupParticipants")
+  records      Record[]
 
   // 타임스탬프
-  createdAt          DateTime      @default(now()) @map("created_at")
-  updatedAt          DateTime      @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("groups")
 }
@@ -42,16 +42,16 @@ model Group {
 // Participant (참여자)
 // ============================================
 model Participant {
-  id        Int      @id @default(autoincrement())
-  nickname  String
-  password  String
-  groupId   Int      @map("group_id")
-  
+  id       Int    @id @default(autoincrement())
+  nickname String
+  password String
+  groupId  Int    @map("group_id")
+
   // 관계
-  group         Group    @relation("GroupParticipants", fields: [groupId], references: [id], onDelete: Cascade)
-  ownedGroups   Group[]  @relation("GroupOwner")
-  records       Record[]
-  
+  group       Group    @relation("GroupParticipants", fields: [groupId], references: [id], onDelete: Cascade)
+  ownedGroups Group[]  @relation("GroupOwner")
+  records     Record[]
+
   // 타임스탬프
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -66,22 +66,22 @@ model Participant {
 // Record (운동 기록)
 // ============================================
 model Record {
-  id           Int      @id @default(autoincrement())
-  exerciseType ExerciseType   @map("exercise_type")
+  id           Int          @id @default(autoincrement())
+  exerciseType ExerciseType @map("exercise_type")
   description  String?
-  time         Int      
-  distance     Float   
-  photos       String[] @default([])
-  
+  time         Int
+  distance     Float
+  photos       String[]     @default([])
+
   // 관계
-  groupId   Int         @map("group_id")
-  group     Group       @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  authorId  Int?        @map("author_id")  // nullable로 변경
-  author    Participant? @relation(fields: [authorId], references: [id], onDelete: SetNull) // Cascade → SetNull
-  
+  groupId  Int          @map("group_id")
+  group    Group        @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  authorId Int?         @map("author_id") // nullable로 변경
+  author   Participant? @relation(fields: [authorId], references: [id], onDelete: SetNull) // Cascade → SetNull
+
   // 타임스탬프
-  createdAt DateTime    @default(now()) @map("created_at")
-  updatedAt DateTime    @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("records")
 }
@@ -90,7 +90,7 @@ model Record {
 // Enum
 // ============================================
 enum ExerciseType {
-  run   // 달리기
-  bike  // 자전거
-  swim  // 수영
+  run // 달리기
+  bike // 자전거
+  swim // 수영
 }
